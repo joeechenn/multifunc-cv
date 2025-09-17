@@ -9,10 +9,11 @@ from mediapipe.tasks.python import BaseOptions
 VisionRunningMode = mp.tasks.vision.RunningMode
 
 class FaceDetect:
-    def __init__(self, model_path):
+    def __init__(self, model_path, min_conf=0.6):
         options = vision.FaceDetectorOptions(
             base_options=BaseOptions(model_asset_path=model_path),
-            running_mode=VisionRunningMode.VIDEO)
+            running_mode=VisionRunningMode.VIDEO,
+            min_detection_confidence=min_conf)
         self.detector = vision.FaceDetector.create_from_options(options)
         self.t0 = time.perf_counter()
         self.last_ts = -1
