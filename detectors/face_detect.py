@@ -6,12 +6,10 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from mediapipe.tasks.python import BaseOptions
 
-MODEL_PATH = "../models/blaze_face_short_range.tflite"
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-class FaceRecog:
+class FaceDetect:
     def __init__(self, model_path):
-        base = mp.tasks.BaseOptions
         options = vision.FaceDetectorOptions(
             base_options=BaseOptions(model_asset_path=model_path),
             running_mode=VisionRunningMode.VIDEO)
@@ -20,7 +18,6 @@ class FaceRecog:
         self.last_ts = -1
 
     def detect(self, frame):
-        t0 = time.time()
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
         ts = int((time.perf_counter() - self.t0) * 1000)
@@ -28,9 +25,9 @@ class FaceRecog:
             ts = self.last_ts + 1
         self.last_ts = ts
         faces = []
-        detection_result = self.detector.detect_for_video(mp_image, ts)
-        if detection_result.detections:
-            for detection in detection_result.detections:
+        face_result = self.detector.detect_for_video(mp_image, ts)
+        if face_result.detections:
+            for detection in face_result.detections:
                 bbox = detection.bounding_box
                 score = detection.categories[0].score if detection.categories else None
                 faces.append({
